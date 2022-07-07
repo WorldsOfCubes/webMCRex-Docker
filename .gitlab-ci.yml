@@ -1,0 +1,20 @@
+image: creatiwww/docker-compose:latest
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+services:
+  - docker:latest
+
+stages:
+  - deploy
+
+deploy-to-prod:
+  stage: deploy
+  allow_failure: false
+  script:
+    - docker-compose pull
+    - docker-compose up --build -d
+  environment:
+    name: Production
+  only:
+    - master
+#  when: manual

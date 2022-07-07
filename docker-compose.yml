@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  webapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH}/www:/var/www/html
+
+    # first load the 'db' service
+    depends_on:
+      - db
+    networks:
+      - reverse-public
+      - webmcrex
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webmcrex.rule=Host(`${HOST}`)
+      - traefik.http.routers.webmcrex.service=webmcrex
+      - traefik.http.routers.webmcrex.tls=true
+      - traefik.http.routers.webmcrex.tls.certresolver=default
+      - traefik.http.services.webmcrex.loadbalancer.server.port=80
+      - traefik.http.services.webmcrex.loadbalancer.server.scheme=http
+
+
+  db:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - ${DATA_PATH}/mysql:/var/lib/mysql
+    networks:
+      - webmcrex
+networks:
+  webmcrex:
+    driver: bridge
+  reverse-public:
+    external: true

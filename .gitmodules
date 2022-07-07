@@ -1,0 +1,3 @@
+[submodule "webMCRexAGPL"]
+	path = webMCRexAGPL
+	url = https://github.com/WorldsOfCubes/webMCRexAGPL.git
